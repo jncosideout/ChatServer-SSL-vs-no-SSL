@@ -1,57 +1,53 @@
 // place this file the path such ends with: ChatServer/server/ChatServer.java
 
-package server_SSL;
+package server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import javax.net.ssl.*;
-
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatServer_w_SSL {
+public class ChatServer {
 
     private static final int portNumber = 4444;
 
     private int serverPort;
-    private List<ClientThread_w_SSL> clients; // or "protected static List<ClientThread_w_SSL> clients;"
+    private List<ClientThread> clients; // or "protected static List<ClientThread> clients;"
 
     public static void main(String[] args){
-        ChatServer_w_SSL server = new ChatServer_w_SSL(portNumber);
+        ChatServer server = new ChatServer(portNumber);
         server.startServer();
     }
 
-    public ChatServer_w_SSL(int portNumber){
+    public ChatServer(int portNumber){
         this.serverPort = portNumber;
     }
 
-    public List<ClientThread_w_SSL> getClients(){
+    public List<ClientThread> getClients(){
         return clients;
     }
 
     private void startServer(){
-        clients = new ArrayList<ClientThread_w_SSL>();
-        SSLServerSocket serverSocket = null;
+        clients = new ArrayList<ClientThread>();
+        ServerSocket serverSocket = null;
         try {
-            SSLServerSocketFactory sslSrvFact = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-            serverSocket = (SSLServerSocket) sslSrvFact.createServerSocket(serverPort);
+            serverSocket = new ServerSocket(serverPort);
             acceptClients(serverSocket);
         } catch (IOException e){
-            System.err.println("Could not listen on port: " + serverPort);
+            System.err.println("Could not listen on port: "+serverPort);
             System.exit(1);
         }
     }
 
-    private void acceptClients(SSLServerSocket serverSocket){
+    private void acceptClients(ServerSocket serverSocket){
 
         System.out.println("server starts port = " + serverSocket.getLocalSocketAddress());
         while(true){
             try{
-                SSLSocket socket = (SSLSocket) serverSocket.accept();
+                Socket socket = serverSocket.accept();
                 System.out.println("accepts : " + socket.getRemoteSocketAddress());
-                ClientThread_w_SSL client = new ClientThread_w_SSL(this, socket);
+                ClientThread client = new ClientThread(this, socket);
                 Thread thread = new Thread(client);
                 thread.start();
                 clients.add(client);
