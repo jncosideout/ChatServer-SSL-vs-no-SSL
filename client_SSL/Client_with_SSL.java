@@ -1,15 +1,12 @@
 // place this file the path such ends with: ChatServer/client/Client.java
 
-package client_SSL;
+package client;
 
 import java.io.IOException;
 import java.net.Socket;
-import javax.net.ssl.*;
-
-
 import java.util.Scanner;
 
-public class Client_with_SSL {
+public class Client {
 
     private static final String host = "localhost";
     private static final int portNumber = 4444;
@@ -31,11 +28,11 @@ public class Client_with_SSL {
             }
         }
 
-        Client_with_SSL client = new Client_with_SSL(readName, host, portNumber);
+        Client client = new Client(readName, host, portNumber);
         client.startClient(scan);
     }
 
-    private Client_with_SSL(String userName, String host, int portNumber){
+    private Client(String userName, String host, int portNumber){
         this.userName = userName;
         this.serverHost = host;
         this.serverPort = portNumber;
@@ -43,12 +40,10 @@ public class Client_with_SSL {
 
     private void startClient(Scanner scan){
         try{
-        	SSLSocketFactory sslFact = (SSLSocketFactory) SSLSocketFactory.getDefault();
-            SSLSocket socket = (SSLSocket) sslFact.createSocket(serverHost, serverPort);
-            //socket.startHandshake();
+            Socket socket = new Socket(serverHost, serverPort);
             Thread.sleep(1000); // waiting for network communicating.
 
-            ServerThread_w_SSL serverThread = new ServerThread_w_SSL(socket, userName);
+            ServerThread serverThread = new ServerThread(socket, userName);
             Thread serverAccessThread = new Thread(serverThread);
             serverAccessThread.start();
             while(serverAccessThread.isAlive()){
@@ -67,8 +62,6 @@ public class Client_with_SSL {
             ex.printStackTrace();
         }catch(InterruptedException ex){
             System.out.println("Interrupted");
-        } catch (Exception all) {
-        	all.printStackTrace();
         }
     }
 }
