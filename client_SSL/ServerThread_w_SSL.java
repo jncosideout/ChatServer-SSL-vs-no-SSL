@@ -1,21 +1,20 @@
 // place this file the path such ends with: ChatServer/client/ServerThread.java
 
-package client_SSL;
+package client;
 
 import java.io.*;
 import java.net.Socket;
-import javax.net.ssl.*;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-public class ServerThread_w_SSL implements Runnable {
-    private SSLSocket socket;
+public class ServerThread implements Runnable {
+    private Socket socket;
     private String userName;
     private boolean isAlived;
     private final LinkedList<String> messagesToSend;
     private boolean hasMessages = false;
 
-    public ServerThread_w_SSL(SSLSocket socket, String userName){
+    public ServerThread(Socket socket, String userName){
         this.socket = socket;
         this.userName = userName;
         messagesToSend = new LinkedList<String>();
@@ -34,17 +33,14 @@ public class ServerThread_w_SSL implements Runnable {
 
         System.out.println("Local Port :" + socket.getLocalPort());
         System.out.println("Server = " + socket.getRemoteSocketAddress() + ":" + socket.getPort());
-		//setup handshake
-        socket.setEnabledCipherSuites(socket.getSupportedCipherSuites());
-        
+
         try{
             PrintWriter serverOut = new PrintWriter(socket.getOutputStream(), false);
             InputStream serverInStream = socket.getInputStream();
             Scanner serverIn = new Scanner(serverInStream);
             // BufferedReader userBr = new BufferedReader(new InputStreamReader(userInStream));
             // Scanner userIn = new Scanner(userInStream);
-            socket.startHandshake();
-            
+
             while(!socket.isClosed()){
                 if(serverInStream.available() > 0){
                     if(serverIn.hasNextLine()){
@@ -64,10 +60,7 @@ public class ServerThread_w_SSL implements Runnable {
         }
         catch(IOException ex){
             ex.printStackTrace();
-        } catch (Exception ee) {
-        	ee.printStackTrace();
         }
-        
 
     }
 }
